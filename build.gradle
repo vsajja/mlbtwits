@@ -48,8 +48,8 @@ task release {
                 delete 'src/ratpack/dist'
             }
             copy {
-                println 'copying portal/dist -> src/ratpack/dist'
-                from 'portal/dist'
+                println 'copying portal-> src/ratpack/dist'
+                from 'portal'
                 into 'src/ratpack/dist'
             }
         }
