@@ -1,0 +1,69 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.ratpack:ratpack-gradle:1.8.0'
+    }
+}
+
+apply plugin: 'io.ratpack.ratpack-groovy'
+
+run {
+    jvmArgs "-Dratpack.port=5051"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+version = file('version.txt').text.trim()
+
+dependencies {
+    implementation 'io.github.http-builder-ng:http-builder-ng-okhttp:1.0.4'
+    implementation 'com.h2database:h2:1.3.176'
+
+    runtimeOnly 'org.slf4j:slf4j-simple:1.7.30'
+
+    testImplementation('org.spockframework:spock-core:1.0-groovy-2.4') {
+        exclude module: 'groovy-all'
+    }
+
+    testImplementation ratpack.dependency('groovy-test')
+}
+
+task stage {
+    dependsOn 'installDist'
+}
+
+
+task release {
+    group = 'release'
+    def releaseUi = true
+
+    doLast {
+        if (releaseUi) {
+            delete {
+                delete 'src/ratpack/dist'
+            }
+            copy {
+                println 'copying portal/dist -> src/ratpack/dist'
+                from 'portal/dist'
+                into 'src/ratpack/dist'
+            }
+        }
+        exec {
+            commandLine 'cmd', '/c',
+                    "git config core.autocrlf false && " +
+                            "git add --all && " +
+                            "git commit -m \"progress - ${project.version}"
+        }
+        exec {
+            commandLine 'cmd', '/c', 'git push --force'
+        }
+    }
+}
+
+release.dependsOn(test)
+
