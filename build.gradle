@@ -47,9 +47,13 @@ task release {
             delete {
                 delete 'src/ratpack/dist'
             }
+            exec {
+                workingDir 'portal'
+                commandLine 'cmd', '/c', 'npm run build'
+            }
             copy {
-                println 'copying portal-> src/ratpack/dist'
-                from 'portal'
+                println 'copying portal/dist -> src/ratpack/dist'
+                from 'portal/dist'
                 into 'src/ratpack/dist'
             }
         }
@@ -65,5 +69,5 @@ task release {
     }
 }
 
-release.dependsOn(test)
 
+release.dependsOn(test)
